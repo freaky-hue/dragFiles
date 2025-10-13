@@ -8,7 +8,7 @@
     "homepage": "https://github.com/freaky-hue/dragFiles",
     "changelogUrl": "https://raw.githubusercontent.com/freaky-hue/dragFiles/refs/heads/main/changelog.md",
     "configUrl": "https://raw.githubusercontent.com/freaky-hue/dragFiles/refs/heads/main/config.json",
-    "downloadUrl": "https://github.com/freaky-hue/plugin/archive/refs/tags/master.zip",
+    "downloadUrl": "https://github.com/freaky-hue/dragFiles/archive/refs/tags/master.zip",
     "repository": {
         "type": "git",
         "url": "https://github.com/freaky-hue/dragFiles.git"
