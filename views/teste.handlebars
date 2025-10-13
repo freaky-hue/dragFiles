@@ -1,0 +1,44 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script type="text/javascript" src="scripts/common-0.0.1.js"></script>
+
+
+</head>
+
+<body>
+    {{#each groups}}
+        {{#if deleted}}
+
+        {{else}}
+            <h2>{{name}}</h2>
+            <h3>{{_id}}</h3>
+        
+        {{/if}}
+    {{/each}}
+
+
+
+    {{#each agents}}
+        {{#if deleted}}
+
+        {{else}}
+            <h2>{{name}}</h2>
+            <h3>{{_id}}</h3>
+
+        {{/if}}
+    {{/each}}
+
+</body>
+
+</html>
+
+<script>
+    Handlebars.registerHelper('isdefined', function (value) {
+        return value !== undefined;
+    });
+</script>
