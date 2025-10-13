@@ -10,35 +10,91 @@
 
 </head>
 
-<body>
-    {{#each groups}}
-        {{#if deleted}}
+<style>
 
-        {{else}}
-            <h2>{{name}}</h2>
-            <h3>{{_id}}</h3>
+    body{}
+
+    .agents{
+        display: flexbox;
+        font-family:Georgia, 'Times New Roman', Times, serif;
+        max-width: 700px;
+    }
+
+    .agents-groups{
+        font-size: 32px;
+        width: 100%;
+    }
+
+    .agents-name{
+        font-size: 19px;
+        margin: 30px;
+        width: 100%;
+    }
+
+
+    .file{
+        display: flex;
+        justify-self: center;
+        display: none;
+        color: black;
         
-        {{/if}}
+    }
+
+
+
+
+</style>
+
+<body>
+    {{log test}}
+    {{#each test}}
+        <div class="agents">
+            <h1 class="agents-groups">
+                <input type="checkbox" id="selectGroup" name="agent" onclick="checkG()">
+                {{groupName}}
+            </h1>
+            
+            <h2 class="agents-name">
+                <input type="checkbox" id="selectPc" name="agent" onclick="check()">
+                {{name}}
+            </h2> 
+        </div>
+        
     {{/each}}
 
-
-
-    {{#each agents}}
-        {{#if deleted}}
-
-        {{else}}
-            <h2>{{name}}</h2>
-            <h3>{{_id}}</h3>
-
-        {{/if}}
-    {{/each}}
-
+    <input class="file" type="file">
 </body>
-
 </html>
 
+
 <script>
-    Handlebars.registerHelper('isdefined', function (value) {
-        return value !== undefined;
-    });
+    const checkGroup = document.querySelector('#selectGroup')
+    const checkb = document.querySelector('#selectPc');
+    const file = document.getElementsByClassName("file")[0];
+
+    function check() {
+        console.log(checkb.checked);
+        
+        checkb.checked || checkGroup.checked ?  file.style.display = "flex" : file.style.display = "none" 
+    
+
+    }
+
+    function checkG() {
+        console.log(checkGroup.checked);
+                
+        
+
+        if(checkGroup.checked){
+            file.style.display = "flex";
+            checkb.checked = true;
+        } else {
+            file.style.display = "none";
+            checkb.checked = false;
+
+        }
+
+    }
+
+    
 </script>

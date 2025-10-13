@@ -19,7 +19,8 @@ module.exports.dragFiles = function (parent) {
         var vars = {
             title: "AAa",
             agents: [],
-            groups: []
+            groups: [],
+            test: []
         }
 
 
@@ -33,14 +34,27 @@ module.exports.dragFiles = function (parent) {
 
 
             vars.groups = info.filter(element => element.type === "mesh");
-
+            vars.test = obj.agent_Groups(vars.agents, vars.groups)
 
             res.render(obj.VIEWS + "teste.handlebars", vars);
         });
 
     }
 
+    obj.agent_Groups = function (agents, groups) {
+        var td = [];
 
+        agents.forEach(element => {
+            const search = groups.find(element_ => element_._id == element.meshid);
+            if (search) {
+                element.groupName = search.name;
+                td.push(element);
+            };
+
+        })
+
+        return td;
+    }
 
 
     obj.hook_webServer = function (req, res, next) {
@@ -49,6 +63,9 @@ module.exports.dragFiles = function (parent) {
             obj.handleAdminReq(req, res, { siteadmin: 0xFFFFFFFF })
         }
     }
+
+
+
 
     return obj;
 
