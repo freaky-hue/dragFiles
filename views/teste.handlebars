@@ -11,59 +11,57 @@
 </head>
 
 <style>
+    body {}
 
-    body{}
-
-    .agents{
+    .agents {
         display: flexbox;
-        font-family:Georgia, 'Times New Roman', Times, serif;
+        font-family: Georgia, 'Times New Roman', Times, serif;
         max-width: 700px;
     }
 
-    .agents-groups{
-        font-size: 32px;
+    .agents-groups {
+        font-size: 26px;
         width: 100%;
     }
 
-    .agents-name{
+    .agents-name {
         font-size: 19px;
         margin: 30px;
         width: 100%;
     }
 
 
-    .file{
+    .file {
         display: flex;
         justify-self: center;
         display: none;
         color: black;
-        
+
     }
-
-
-
-
 </style>
 
 <body>
     {{log test}}
+    <h1>{{title}}</h1>
     {{#each test}}
-        <div class="agents">
-            <h1 class="agents-groups">
-                <input type="checkbox" id="selectGroup" name="agent" onclick="checkG()">
-                {{groupName}}
-            </h1>
-            
-            <h2 class="agents-name">
-                <input type="checkbox" id="selectPc" name="agent" onclick="check()">
-                {{name}}
-            </h2> 
-        </div>
-        
+    <div class="agents">
+        <h1 class="agents-groups">
+            <input type="checkbox" id="selectGroup" name="agent" onclick="checkG()">
+            {{groupName}}
+        </h1>
+
+        <h2 class="agents-name">
+            <input type="checkbox" id="selectPc" name="agent" onclick="check()">
+            {{name}}
+        </h2>
+
+    </div>
+
     {{/each}}
 
     <input class="file" type="file">
 </body>
+
 </html>
 
 
@@ -74,18 +72,26 @@
 
     function check() {
         console.log(checkb.checked);
-        
-        checkb.checked || checkGroup.checked ?  file.style.display = "flex" : file.style.display = "none" 
-    
+
+
+        if (checkb.checked) {
+            file.style.display = "flex"
+        } else {
+            file.style.display = "none"
+            if (checkGroup.checked) {
+                checkGroup.checked = false;
+            }
+        }
+
 
     }
 
     function checkG() {
         console.log(checkGroup.checked);
-                
-        
 
-        if(checkGroup.checked){
+
+
+        if (checkGroup.checked) {
             file.style.display = "flex";
             checkb.checked = true;
         } else {
@@ -96,5 +102,5 @@
 
     }
 
-    
+
 </script>
