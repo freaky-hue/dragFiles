@@ -11,96 +11,174 @@
 </head>
 
 <style>
-    body {}
-
-    .agents {
-        display: flexbox;
-        font-family: Georgia, 'Times New Roman', Times, serif;
-        max-width: 700px;
+    body{
+        font-family: 'Arial';
     }
 
-    .agents-groups {
-        font-size: 26px;
+    .container {
+        padding: 5px 20px;
+        margin: 10px 0;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .group-section {
+        padding: 20px;
+        border: 1px solid;
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+
+    }
+
+    .group {
+        padding: 10px 0px;
+        border-bottom: 1px solid;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+
+    .agent {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        font-size: 18px;
+        margin-left: 10px;
+        padding-top: 10px;
+    }
+
+    .group-checkbox {
+        vertical-align: middle;
+        width: 18px;
+    }
+
+    .agents-checkbox {
+        vertical-align: middle;
+        width: 18px;
+    }
+
+    .select-file-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .select-file {
+        margin-top: 20px;
         width: 100%;
+        border: 1px solid;
+        padding: 10px 25px;
+        cursor: pointer;
+        text-align: center;
+        font-weight: bolder;
     }
 
-    .agents-name {
-        font-size: 19px;
-        margin: 30px;
-        width: 100%;
+    .select-file:hover{
+        opacity: 57%;
     }
 
-
-    .file {
+    .submit-file {
         display: flex;
         justify-self: center;
-        display: none;
-        color: black;
+        background: #fff;
+        border: 1px solid;
+        cursor: pointer;
+        padding: 7px 14px;
+        font-weight: bold;
+    }
 
+    .submit-file:hover{
+        opacity: 57%;
+    }
+
+
+    input[type="file"] {
+        display: none;
     }
 </style>
 
 <body>
-    {{log test}}
-    <h1>{{title}}</h1>
-    {{#each test}}
-    <div class="agents">
-        <h1 class="agents-groups">
-            <input type="checkbox" id="selectGroup" name="agent" onclick="checkG()">
-            {{groupName}}
-        </h1>
+    {{log groupInfo}}
+    <div class="container">
+        {{#each groupInfo}}
+        <div class="group-section">
+            <div class="group">
+                <label>{{groupName}}</label>
+                <input type="checkbox" class="group-checkbox" group_id="{{groupId}}" onchange="check('{{groupId}}')">
+            </div>
 
-        <h2 class="agents-name">
-            <input type="checkbox" id="selectPc" name="agent" onclick="check()">
-            {{name}}
-        </h2>
+            {{#each agents}}
+            <div class="agent">
+                <label>{{name}}</label>
+                <input type="checkbox" class="agents-checkbox" group_id="{{../groupId}}" agent_id="{{_id}}">
 
+            </div>
+
+            {{/each}}
+        </div>
+        {{/each}}
+
+    <div class="select-file-container">
+        <label class="select-file" style="display: none;">
+            <input class="fs" type="file" onchange="checkFile()">
+            Select File
+        </label>
+    </div>
+        <input class="submit-file" style="display: none;" type="submit" value="Submit">
     </div>
 
-    {{/each}}
 
-    <input class="file" type="file">
+
 </body>
 
 </html>
 
-
 <script>
-    const checkGroup = document.querySelector('#selectGroup')
-    const checkb = document.querySelector('#selectPc');
-    const file = document.getElementsByClassName("file")[0];
 
-    function check() {
-        console.log(checkb.checked);
+    const filesel = document.getElementsByClassName('select-file')[0];
+    const filesend = document.querySelector('input[type=submit]');
 
 
-        if (checkb.checked) {
-            file.style.display = "flex"
+    function check(groupId) {
+        const group = document.querySelector(`[group_id="${groupId}"].group-checkbox`);
+        const agents = document.querySelectorAll(`[group_id="${groupId}"].agents-checkbox`);
+
+        agents.forEach((agentes) => {
+            agentes.checked = group.checked;
+        });
+
+
+
+        if (group.checked) {
+            filesel.style.display = "block";
+
         } else {
-            file.style.display = "none"
-            if (checkGroup.checked) {
-                checkGroup.checked = false;
-            }
-        }
-
-
-    }
-
-    function checkG() {
-        console.log(checkGroup.checked);
-
-
-
-        if (checkGroup.checked) {
-            file.style.display = "flex";
-            checkb.checked = true;
-        } else {
-            file.style.display = "none";
-            checkb.checked = false;
+            filesel.style.display = "none";
+            filesend.style.display = "none";
 
         }
 
     }
 
+    function checkFile() {
+        const fs = document.getElementsByClassName("fs")[0];
+
+
+        console.log(filesend)
+
+        if (fs.value) {
+            filesend.style.display = "block";
+        } else {
+            filesend.style.display = "none";
+
+        }
+    }
 
 </script>

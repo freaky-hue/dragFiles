@@ -9,9 +9,11 @@ module.exports.dragFiles = function (parent) {
 
 
 
+
+
     obj.handleAdminReq = function (req, res, user) {
         if ((user.siteadmin & 0xFFFFFFFF) == 0) {
-            res.sendstatus(401);
+            res.sendStatus(401);
             return;
 
         }
@@ -20,7 +22,7 @@ module.exports.dragFiles = function (parent) {
             title: "AAa",
             agents: [],
             groups: [],
-            test: []
+            groupInfo: []
         }
 
 
@@ -32,39 +34,46 @@ module.exports.dragFiles = function (parent) {
 
             vars.agents = info.filter(element => element.type === "node");
 
-
             vars.groups = info.filter(element => element.type === "mesh");
-            vars.test = obj.agent_Groups(vars.agents, vars.groups)
+
+            vars.groupInfo = obj.group_agents(vars.agents, vars.groups);
 
             res.render(obj.VIEWS + "teste.handlebars", vars);
         });
 
     }
 
-    obj.agent_Groups = function (agents, groups) {
-        var td = [];
+    obj.group_agents = function (agents, groups) {
+        var infoAG = [];
+        groups.forEach(group => {
+            var agentOGroup = agents.filter(agent => agent.meshid === group._id)
 
-        agents.forEach(element => {
-            const search = groups.find(element_ => element_._id == element.meshid);
-            if (search) {
-                element.groupName = search.name;
-                td.push(element);
-            };
 
-        })
+            if (agentOGroup.length > 0) {
+                infoAG.push({
+                    groupId: group._id,
+                    groupName: group.name,
+                    agents: agentOGroup
+                })
+            }
+        });
 
-        return td;
+        return infoAG;
     }
+
+
+
+
 
 
     obj.hook_webServer = function (req, res, next) {
         if (req.path === "dragfiles") {
             console.log("a")
             obj.handleAdminReq(req, res, { siteadmin: 0xFFFFFFFF })
+        } else {
+            next
         }
     }
-
-
 
 
     return obj;
