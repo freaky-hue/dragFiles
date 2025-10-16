@@ -24,6 +24,7 @@ module.exports.dragFiles = function (parent) {
         // console.log(ws);
 
 
+        
     }
 
 
@@ -114,8 +115,8 @@ module.exports.dragFiles = function (parent) {
             agents.forEach((agent) => {
                 if (agent.type == "node" && agent.meshid == id) {
                     console.log("\n" + soloPath + " <- ->" + agent._id);
-                    
-                    obj.testes(agent._id, soloPath, 'C:/')
+
+                    obj.testes(agent._id, soloPath, 'C:/',fs.statSync(soloPath).size)
 
                 }
 
@@ -127,7 +128,7 @@ module.exports.dragFiles = function (parent) {
 
 
 
-    obj.testes = function (deviceId, filePath, targetPath) {
+    obj.testes = function (deviceId, filePath, targetPath, sizee) {
         fs.readFile(path.join(__dirname + '\\key.txt'), "utf8", (err, info) => {
             if (err) {
                 console.log(err);
@@ -138,18 +139,22 @@ module.exports.dragFiles = function (parent) {
 
             try {
                 // const command = `node node_modules/meshcentral/meshctrl upload --id bEqEJrtv8SPx56h5xbfai8q3D6z227qlz3XHmR72HecL0guw1kOiEF7debgUhrlP --file meshcentral-files\\domain\\mesh-vNgfQV5mUA7o0w3qpPkgIMWOZ269zTTk$nRSF2Oribv4AkYthReaNgYQUCraeMpS\\-.pdf --target C:/ --loginuser ${info.split('\n')[0]} --loginpass ${info.split('\n')[1]}`;
+                
+                var upload = obj.check_Files(filePath, targetPath, sizee);
 
-                const command = `node node_modules/meshcentral/meshctrl upload --id ${deviceId.split('//')[1]} --file ${filePath} --target ${targetPath} --loginuser ${info.split('\n')[0]} --loginpass ${info.split('\n')[1]}`;
-
-
-
-                setTimeout(() => {
-                    cp.exec(command, (error, stdout, stderr) => {
-                        if (error) {
-                            console.error(`exec error: ${error}`);
-                            return;
-                        }
-                        if (stderr) {
+                if(upload){
+                    console.log("Upload")
+                    const command = `node node_modules/meshcentral/meshctrl upload --id ${deviceId.split('//')[1]} --file ${filePath} --target ${targetPath} --loginuser ${info.split('\n')[0]} --loginpass ${info.split('\n')[1]}`;
+                    
+                    
+                    
+                    setTimeout(() => {
+                        cp.exec(command, (error, stdout, stderr) => {
+                            if (error) {
+                                console.error(`exec error: ${error}`);
+                                return;
+                            }
+                            if (stderr) {
                             console.error(`stderr: ${stderr}`);
                             return;
                         }
@@ -161,23 +166,52 @@ module.exports.dragFiles = function (parent) {
                             console.error('Failed :', e);
                         }
                     });
-                }, 4000)
+                }, 4000);
+
+                
+                
+            } else {
+                console.log("N upload")
+            }
             } catch (errr) {
                 console.log(errr);
-
+                
             }
         });
     }
 
 
+    obj.check_Files = function (file,tpath, sizee) {
+        const getfilename = file.split("\\")[file.split("\\").length - 1];
+        var upload = false;
+        
+        if(fs.existsSync(tpath + getfilename)){
+
+            const files =  fs.statSync(tpath + getfilename)
+                console.log(files.size + "->" + sizee)
+                if(files.size  == sizee){
+                    upload = false;
+                } else {
+                    upload =  true;                
+                }
+                
+        } else{
+            upload = true
+        }
+        return upload;
+            
+
+    }
 
     obj.server_startup = function (req, res, next) {
         // console.log(obj.args.user);
+        readline.emitKeypressEvents(process.stdin);
+
+        
         obj.viewFiles()
 
 
 
-        // console.log(path.join(os.homedir() + "\\Desktop"));
     }
 
     return obj;
