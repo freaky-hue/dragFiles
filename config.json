@@ -4,7 +4,7 @@
     "version": "0.0.0",
     "author": "",
     "description": "A sample plugin. Prompt for note on remote desktop disconnect.",
-    "hasAdminPanel": true,
+    "hasAdminPanel": false,
     "homepage": "https://github.com/freaky-hue/dragFiles",
     "changelogUrl": "https://raw.githubusercontent.com/freaky-hue/dragFiles/refs/heads/main/changelog.md",
     "configUrl": "https://raw.githubusercontent.com/freaky-hue/dragFiles/refs/heads/main/config.json",
