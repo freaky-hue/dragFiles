@@ -205,7 +205,6 @@ module.exports.dragFiles = function (parent) {
 
     obj.server_startup = function (req, res, next) {
         // console.log(obj.args.user);
-        readline.emitKeypressEvents(process.stdin);
 
         
         obj.viewFiles()
