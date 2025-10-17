@@ -12,56 +12,68 @@ module.exports.dragFiles = function (parent) {
     const cp = require('child_process');
     const os = require('os');
 
-    obj.dirFiles = path.join(__dirname, '../../../meshcentral-files/domain/');
+
+    if (os.platform == "win32") {
+
+        obj.dirFiles = path.join(__dirname, '../../../meshcentral-files/domain/');
 
 
 
-    obj.hook_agentCoreIsStable = function (nodeObj) {
-        const ws = obj.meshServer.webserver.wsagents[nodeObj.dbNodeKey];
+        obj.hook_agentCoreIsStable = function (nodeObj) {
+
+            const ws = obj.meshServer.webserver.wsagents[nodeObj.dbNodeKey];
+
+            fs.watch(obj.dirFiles, (err, info) => {
+                if (info) {
+                    obj.viewFiles();
+
+                }
+            })
 
 
-        // console.log(ws);
+
+            // console.log(ws);
 
 
 
-    }
-
-
-    obj.viewFiles = function () {
-        try {
-            const exists = fs.existsSync(obj.dirFiles);
-
-            if (exists) {
-                console.log('Pasta (domain) dos ficheiros? encontrada');
-
-            } else {
-                console.log('N enc');
-
-            }
-        } catch (error) {
-            console.log(error);
         }
 
-        const idsGroup = [];
-        var filesPath = [];
 
-        obj.meshServer.db.GetAll((err, allInfo) => {
-            if (err) {
-                console.log(err);
+        obj.viewFiles = function () {
+            try {
+                const exists = fs.existsSync(obj.dirFiles);
 
+                if (exists) {
+                    console.log('Pasta (domain) dos ficheiros? encontrada');
+
+                } else {
+                    console.log('N enc');
+
+                }
+            } catch (error) {
+                console.log(error);
             }
 
+            const idsGroup = [];
+            var filesPath = [];
 
-            allInfo.forEach(element => {
-                if (element.type == "mesh") {
-                    const group_id = String(element._id);
-                    const group_id_dir = group_id.replace("//", "-");
-                    idsGroup.push(group_id_dir);
+            obj.meshServer.db.GetAll((err, allInfo) => {
+                if (err) {
+                    console.log(err);
+
                 }
-            });
 
-            idsGroup.forEach((id) => {
-                
+
+                allInfo.forEach(element => {
+                    if (element.type == "mesh") {
+                        const group_id = String(element._id);
+                        const group_id_dir = group_id.replace("//", "-");
+                        idsGroup.push(group_id_dir);
+                    }
+                });
+
+                idsGroup.forEach((id) => {
+
 
                     const nPath = obj.dirFiles + id;
 
@@ -86,161 +98,160 @@ module.exports.dragFiles = function (parent) {
                     } catch (error) {
                         console.log(error)
                     }
-                
+
+                });
+
+
+
+
             });
+        }
+
+        obj.hook_userLoggedIn = function (a) {
+            // console.log(a);
+
+        }
 
 
+        obj.getGDevices = function (groupid, soloPath) {
+            const id = String(groupid).replace("-", "//");
+            // console.log("->" + id + " -> " + soloPath);
 
+            obj.meshServer.db.GetAll((err, agents) => {
+                if (err) {
+                    console.log(err);
 
-        });
-    }
-
-    obj.hook_userLoggedIn = function (a) {
-        // console.log(a);
-
-    }
-
-
-    obj.getGDevices = function (groupid, soloPath) {
-        const id = String(groupid).replace("-", "//");
-        // console.log("->" + id + " -> " + soloPath);
-
-        obj.meshServer.db.GetAll((err, agents) => {
-            if (err) {
-                console.log(err);
-
-            }
-            agents.forEach((agent) => {
-                if (agent.type == "node" && agent.meshid == id) {
-                    console.log("\n" + soloPath + " <- ->" + agent._id);
+                }
+                agents.forEach((agent) => {
+                    if (agent.type == "node" && agent.meshid == id) {
+                        // console.log("\n" + soloPath + " <- ->" + agent._id);
 
 
 
                         obj.testes(agent._id, soloPath, path.parse(process.cwd()).root, fs.statSync(soloPath).size);
 
-                    
 
-                }
+
+                    }
+
+                })
 
             })
-
-        })
-    }
+        }
 
 
 
 
-    obj.testes = function (deviceId, filePath, targetPath, sizee) {
-        fs.readFile(path.join(__dirname + '\\key.txt'), "utf8", (err, info) => {
-            if (err) {
-                console.log(err);
+        obj.testes = function (deviceId, filePath, targetPath, sizee) {
+            fs.readFile(path.join(__dirname + '\\key.txt'), "utf8", (err, info) => {
+                if (err) {
+                    console.log(err);
 
-            }
-
-
-
-            try {
-                // const command = `node node_modules/meshcentral/meshctrl upload --id bEqEJrtv8SPx56h5xbfai8q3D6z227qlz3XHmR72HecL0guw1kOiEF7debgUhrlP --file meshcentral-files\\domain\\mesh-vNgfQV5mUA7o0w3qpPkgIMWOZ269zTTk$nRSF2Oribv4AkYthReaNgYQUCraeMpS\\-.pdf --target C:/ --loginuser ${info.split('\n')[0]} --loginpass ${info.split('\n')[1]}`;
-
-                var nTarget = obj.mkdirIfNotExists(targetPath)
-
-                var upload = obj.check_Files(filePath, nTarget, sizee);
-
-                if (upload) {
-                    console.log("Upload");
-                    const command = `node node_modules/meshcentral/meshctrl upload --id ${deviceId.split('//')[1]} --file ${filePath} --target ${nTarget} --loginuser ${info.split('\n')[0]} --loginpass ${info.split('\n')[1]}`;
-
-
-
-                    setTimeout(() => {
-                        cp.exec(command, (error, stdout, stderr) => {
-                            if (error) {
-                                console.error(`exec error: ${error}`);
-                                return;
-                            }
-                            if (stderr) {
-                                console.error(`stderr: ${stderr}`);
-                                return;
-                            }
-
-                            try {
-                                const res = stdout;
-                                console.log('Resultado:', res);
-                            } catch (e) {
-                                console.error('Failed :', e);
-                            }
-                        });
-                    }, 4000);
-
-
-
-                } else {
-                    console.log("N upload");
                 }
-            } catch (errr) {
-                console.log(errr);
 
-            }
-        });
-    }
 
-    obj.check_Files = function (file, tpath, sizee) {
-        const getfilename = file.split("\\")[file.split("\\").length - 1];
-        var upload = false;
 
-        if (fs.existsSync(tpath + getfilename)) {
-            const files = fs.statSync(tpath + getfilename);
+                try {
+                    // const command = `node node_modules/meshcentral/meshctrl upload --id bEqEJrtv8SPx56h5xbfai8q3D6z227qlz3XHmR72HecL0guw1kOiEF7debgUhrlP --file meshcentral-files\\domain\\mesh-vNgfQV5mUA7o0w3qpPkgIMWOZ269zTTk$nRSF2Oribv4AkYthReaNgYQUCraeMpS\\-.pdf --target C:/ --loginuser ${info.split('\n')[0]} --loginpass ${info.split('\n')[1]}`;
 
-            console.log(files.size + "->" + sizee);
-            if (files.size == sizee) {
-                upload = false;
+                    var nTarget = obj.mkdirIfNotExists(targetPath)
+
+                    var upload = obj.check_Files(filePath, nTarget, sizee);
+
+                    if (upload) {
+                        console.log("Upload");
+                        const command = `node node_modules/meshcentral/meshctrl upload --id ${deviceId.split('//')[1]} --file ${filePath} --target ${nTarget} --loginuser ${info.split('\n')[0]} --loginpass ${info.split('\n')[1]}`;
+
+
+
+                        setTimeout(() => {
+                            cp.exec(command, (error, stdout, stderr) => {
+                                if (error) {
+                                    console.error(`exec error: ${error}`);
+                                    return;
+                                }
+                                if (stderr) {
+                                    console.error(`stderr: ${stderr}`);
+                                    return;
+                                }
+
+                                try {
+                                    const res = stdout;
+                                    console.log('Resultado:', res);
+                                } catch (e) {
+                                    console.error('Failed :', e);
+                                }
+                            });
+                        }, 4000);
+
+
+
+                    } else {
+                        console.log("N upload");
+                    }
+                } catch (errr) {
+                    console.log(errr);
+
+                }
+            });
+        }
+
+        obj.check_Files = function (file, tpath, sizee) {
+            const getfilename = file.split("\\")[file.split("\\").length - 1];
+            var upload = false;
+
+            if (fs.existsSync(tpath + getfilename)) {
+                const files = fs.statSync(tpath + getfilename);
+
+                console.log(files.size + "->" + sizee);
+                if (files.size == sizee) {
+                    upload = false;
+                } else {
+                    upload = true;
+                }
+
             } else {
+                console.log(getfilename + "->" + sizee);
                 upload = true;
             }
 
-        } else {
-            console.log(getfilename + "->" + sizee);
-            upload = true;
+
+            return upload;
+
+
         }
-        return upload;
 
-
-    }
-
-    obj.mkdirIfNotExists = function (targetP) {
-        if (fs.existsSync(targetP + "meshfiles")){
-            return path.join(targetP + "meshfiles/")
-            
-        } else {
-            
-            try {
-                fs.mkdirSync(targetP + "meshfiles/");
+        obj.mkdirIfNotExists = function (targetP) {
+            if (fs.existsSync(targetP + "meshfiles")) {
                 return path.join(targetP + "meshfiles/")
-                
-                
-            } catch (err) {
-                console.log(err);
-                
+
+            } else {
+
+                try {
+                    fs.mkdirSync(targetP + "meshfiles/");
+                    return path.join(targetP + "meshfiles/")
+
+
+                } catch (err) {
+                    console.log(err);
+
+                }
+
             }
-            
+
         }
 
+
+        obj.server_startup = function (req, res, next) {
+            console.log('Plugin Ligado');
+
+            // console.log(Object.keys(obj.meshServer.db));
+
+
+        }
+
+        return obj;
     }
 
 
-    obj.server_startup = function (req, res, next) {
-        // console.log(obj.args.user);
-
-        // console.log(Object.keys(obj.meshServer.db));
-        
-        
-        obj.viewFiles();
-
-
-
-    }
-
-    return obj;
 }
-
-
