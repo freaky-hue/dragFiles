@@ -5,10 +5,9 @@ module.exports.dragFiles = function (parent) {
     const obj = {};
     obj.parent = parent;
     obj.meshServer = parent.parent;
-    obj.args = require('minimist')(process.argv.slice(2))
 
-
-    const path = require('path')
+    obj.args = require('minimist')(process.argv.slice(2));
+    const path = require('path');
     const fs = require('fs');
     const cp = require('child_process');
     const os = require('os');
@@ -115,7 +114,11 @@ module.exports.dragFiles = function (parent) {
                 if (agent.type == "node" && agent.meshid == id) {
                     console.log("\n" + soloPath + " <- ->" + agent._id);
 
-                    obj.testes(agent._id, soloPath, 'C:/', fs.statSync(soloPath).size);
+
+
+                        obj.testes(agent._id, soloPath, path.parse(process.cwd()).root, fs.statSync(soloPath).size);
+
+                    
 
                 }
 
@@ -139,11 +142,13 @@ module.exports.dragFiles = function (parent) {
             try {
                 // const command = `node node_modules/meshcentral/meshctrl upload --id bEqEJrtv8SPx56h5xbfai8q3D6z227qlz3XHmR72HecL0guw1kOiEF7debgUhrlP --file meshcentral-files\\domain\\mesh-vNgfQV5mUA7o0w3qpPkgIMWOZ269zTTk$nRSF2Oribv4AkYthReaNgYQUCraeMpS\\-.pdf --target C:/ --loginuser ${info.split('\n')[0]} --loginpass ${info.split('\n')[1]}`;
 
-                var upload = obj.check_Files(filePath, targetPath, sizee);
+                var nTarget = obj.mkdirIfNotExists(targetPath)
+
+                var upload = obj.check_Files(filePath, nTarget, sizee);
 
                 if (upload) {
                     console.log("Upload");
-                    const command = `node node_modules/meshcentral/meshctrl upload --id ${deviceId.split('//')[1]} --file ${filePath} --target ${targetPath} --loginuser ${info.split('\n')[0]} --loginpass ${info.split('\n')[1]}`;
+                    const command = `node node_modules/meshcentral/meshctrl upload --id ${deviceId.split('//')[1]} --file ${filePath} --target ${nTarget} --loginuser ${info.split('\n')[0]} --loginpass ${info.split('\n')[1]}`;
 
 
 
@@ -179,7 +184,6 @@ module.exports.dragFiles = function (parent) {
         });
     }
 
-
     obj.check_Files = function (file, tpath, sizee) {
         const getfilename = file.split("\\")[file.split("\\").length - 1];
         var upload = false;
@@ -203,13 +207,33 @@ module.exports.dragFiles = function (parent) {
 
     }
 
+    obj.mkdirIfNotExists = function (targetP) {
+        if (fs.existsSync(targetP + "meshfiles")){
+            return path.join(targetP + "meshfiles/")
+            
+        } else {
+            
+            try {
+                fs.mkdirSync(targetP + "meshfiles/");
+                return path.join(targetP + "meshfiles/")
+                
+                
+            } catch (err) {
+                console.log(err);
+                
+            }
+            
+        }
+
+    }
+
 
     obj.server_startup = function (req, res, next) {
         // console.log(obj.args.user);
 
         // console.log(Object.keys(obj.meshServer.db));
-
-
+        
+        
         obj.viewFiles();
 
 
