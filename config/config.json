@@ -1,6 +1,6 @@
 {
     "user":"YOUR_USER_KEY_HERE", // create login token and paste the username
-    "pass":"YOUR_LOGIN_KEY_HERE",  same with user but for the password
+    "pass":"YOUR_LOGIN_KEY_HERE", // same with user but for the password
     "host_upload_folder":"C:/meshfiles", // upload receiver path
     "agent_root": "C:/"  
 }
